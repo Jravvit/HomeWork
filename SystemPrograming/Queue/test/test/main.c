@@ -9,8 +9,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <pthread.h>
 
 #define MAX_SIZE 100
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t buffer_has_space = PTHREAD_COND_INITIALIZER;
+pthread_cond_t buffer_has_data = PTHREAD_COND_INITIALIZER;
+
 
 typedef void* Data;
 
@@ -28,7 +33,8 @@ typedef struct queue{
 Queue* createQ(void);
 Data dequeue(Queue* Q);
 void enqueue(Queue* Q, Data data);
-
+void destroyQ(Queue* Q);
+Data eraseQ(Queue* Q,int i);
 
 Queue* createQ(void) {
     Queue* q = (Queue*) malloc(sizeof(Queue));
@@ -74,6 +80,43 @@ Data dequeue(Queue* Q) {
     }
 }
 
+void destroyQ(Queue* Q) {
+    while(Q->count != 0) {
+        dequeue(Q);
+    }
+    free(Q);
+    printf("Destroy Queue Success\n");
+}
+
+void producer (Queue* Q)
+{
+    int i;
+    for (i =0; i < 100; i++) {
+        pthread_mutex_lock(&mutex);
+        if (Q->count == 100) // buffer full !
+            pthread_cond_wait (&buffer_has_space, &mutex);
+        
+        enqueue(Q,i);
+        pthread_cond_signal(&buffer_has_data);
+        pthread_mutex_unlock(&mutex);
+    }
+}
+
+void consumer (Queue* Q)
+{
+    int i;
+    Data data;
+    for (i =0; i < 100; i++) {
+        pthread_mutex_lock(&mutex);
+        if (Q->count == 0) // buffer empty !
+            pthread_cond_wait(&buffer_has_data, &mutex);
+        
+        data = dequeue(Q);
+        pthread_cond_signal(&buffer_has_space);
+        pthread_mutex_unlock(&mutex);
+        printf("data = %d\n",data);
+    }
+}
 
 int main() {
     Queue* myqueue=createQ();
@@ -89,7 +132,7 @@ int main() {
     printf("remove_front: %s\n",dequeue(myqueue));
     printf("remove_front: %d\n",dequeue(myqueue));
     
-  //  destroy_queue(myqueue);
+    destroyQ(myqueue);
     
     return 0;
 }
