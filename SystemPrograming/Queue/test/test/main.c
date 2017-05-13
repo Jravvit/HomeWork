@@ -35,7 +35,7 @@ Data dequeue(Queue* Q);
 void enqueue(Queue* Q, Data data);
 void destroyQ(Queue* Q);
 Data eraseQ(Queue* Q,int i);
-Queue* myqueue;
+Queue* Q;
 
 Queue* createQ(void) {
     Queue* q = (Queue*) malloc(sizeof(Queue));
@@ -89,7 +89,7 @@ void destroyQ(Queue* Q) {
     printf("Destroy Queue Success\n");
 }
 
-void producer (Queue* Q)
+void producer (void)
 {
     int i;
     for (i =0; i < 100; i++) {
@@ -103,7 +103,7 @@ void producer (Queue* Q)
     }
 }
 
-void consumer (Queue* Q)
+void consumer (void)
 {
     int i;
     Data data;
@@ -122,7 +122,7 @@ void consumer (Queue* Q)
 int main(void)
 {
     int i;
-    myqueue=createQ();
+    Q=createQ();
     
     pthread_t threads[2];
     pthread_create(&threads[0], NULL, producer, NULL);
