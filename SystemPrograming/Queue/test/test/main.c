@@ -125,8 +125,8 @@ int main(void)
     myqueue=createQ();
     
     pthread_t threads[2];
-    pthread_create (&threads[0], NULL, producer, NULL);
-    pthread_create (&threads[1], NULL, consumer, NULL);
+    pthread_create(&threads[0], NULL, producer, NULL);
+    pthread_create(&threads[1], NULL, consumer, NULL);
     for (i=0; i< 2; i++)
         pthread_join(threads[i], NULL);
     
