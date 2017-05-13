@@ -35,6 +35,8 @@ Data dequeue(Queue* Q);
 void enqueue(Queue* Q, Data data);
 void destroyQ(Queue* Q);
 Data eraseQ(Queue* Q,int i);
+void consumer(void);
+void producer(void);
 Queue* Q;
 
 Queue* createQ(void) {
